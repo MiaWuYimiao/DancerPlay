@@ -1,0 +1,15 @@
+#sidebar-wrapper{
+    z-index: 1;
+    position: absolute;
+    width: 250;
+    height: 100%;
+    overflow-y: hidden;
+    background: white;
+    opacity: 0.9;
+}
+
+#page-content-wrapper{
+    position: absolute;
+    padding: 15px;
+    padding-left: 250px;
+}
