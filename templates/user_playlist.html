@@ -1,0 +1,28 @@
+{% extends 'base.html'  %}
+{% block title %}{{ user.username }} playlist{% endblock %}
+
+{% block content %}
+<h1>{{ user.username }} playlist </h1>
+
+<div>
+    {% for playlist in user.playlists %}
+    <div class="card my-4">
+      <div class="card-body">
+        <h5 class="card-title text-info">
+          {{playlist.name}}
+          {% if session['username'] == user.username %}
+          <form style="display:inline;">
+            <button class="btn btn-sm btn-prime float-right" formaction="/playlist/{{ playlist.id }}/delete" formmethod="POST"><i class="fas fa-trash"></i></button>
+            <button class="btn btn-sm btn-prime float-right" formaction="/playlist/{{ playlist.id }}/update" ><i class="fas fa-edit"></i></button>
+          </form>
+          {% endif %}
+        </h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{playlist.description}}</h6>
+  
+      </div>
+    </div>
+  
+    {%  endfor %}
+</div>
+
+{% endblock %}

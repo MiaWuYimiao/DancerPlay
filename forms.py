@@ -9,8 +9,8 @@ class UserForm(FlaskForm):
     first_name = StringField("First name", validators=[InputRequired(), Length(max=30)])
     last_name = StringField("Last name", validators=[InputRequired(), Length(max=30)])
     email = StringField("Email", validators=[InputRequired(), Email(), Length(max=50)])
-    head_img = StringField("Profile image", validators=[URL()])
-    fav_type = StringField("Favorite type", validators=[])
+    head_img = StringField("(Optional) Profile image")
+    fav_type = StringField("(Optional) Favorite type")
 
 
 class LoginForm(FlaskForm):

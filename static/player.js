@@ -3,14 +3,17 @@ $(document).ready(function(){
     var currentPlayerId = -1;
     var currentPlayerState = false;
     var totalCount = playlist.length;
-    console.log(`totalCount ${totalCount}`);
+    var types = [];
 
     const $typeselect = $('#type-select');
+    const $styleselect = $('#style-select');
+    const $playlength = $('#length-range');
 
     // The <iframe> (and video player) will replace this <div> tag.
     createHTMLVideoPlayers();
 
     function createHTMLVideoPlayers(){
+        console.log(`playlist size: ${totalCount}`);
         $('.container-sm').empty();
         playlist.forEach(function(id, index){
             $('.container-sm').append(`
@@ -168,23 +171,13 @@ $(document).ready(function(){
 
 
     /*******************Set style and type options *************/
-    $('#style-select').change(function(){
+    $styleselect.change(function(){
         // 0: Ballet  1: Latin  2: Ballroom  3:Hip Hop
+        console.log(this.value)
 
-        var option = this.selectedIndex;
-        var types;
-        if(option === 0) {
-            types = ["Barre", "Centre"];
-        }
-        else if(option === 1) {
-            types = ["Rumba", "Cha Cha Cha", "Samba", "Paso Doble", "Jive"];
-        }
-        else if(option === 2) {
-            types = ["Waltz", "Foxtrot", "Viennese Waltz", "Quickstep", "Tango"];
-        }
-        else if(option === 3) {
-            types = ["Locking", "Hip-hop", "Popping", "House", "Breaking"];
-        }
+        var style_option = this.value;
+
+        setTypes(style_option);
 
         $typeselect.html("");
         types.forEach(function(item) {
@@ -192,27 +185,57 @@ $(document).ready(function(){
         });
     });
 
-    function setTypeOptions(style){
-        console.log(style);
-
-       var types;
-       if(style === 'Ballet') {
-            types = ["Barre", "Centre"];
-       }
-       else if(style === 'Latin') {
-            types = ["Rumba", "Cha Cha Cha", "Samba", "Paso Doble", "Jive"];
-       }
-       else if(style === 'Ballroom') {
-            types = ["Waltz", "Foxtrot", "Viennese Waltz", "Quickstep", "Tango"];
-       }
-       else if(style === 'Hip Hop') {
-            types = ["Locking", "Hip-hop", "Popping", "House", "Breaking"];
-       }
-       $typeselect.html("");
-       types.forEach(function(item) {
-           $typeselect.append("<option>" + item + "</option>");
-       });
+    function setStyleOptions(style) {
+        console.log(`setStyleOptions: style = ${style}`);
+        const styles = ['Ballet', 'Latin', 'Ballroom', 'Hip Hop'];
+        $styleselect.html("");
+        styles.forEach(function(item) {
+            if(style === item) {
+                $styleselect.append(`<option value=${item} selected>` + item + "</option>");
+            } else {
+                $styleselect.append(`<option value=${item}>` + item + "</option>");
+            }
+        });
     }
 
-    setTypeOptions(style);
+    setStyleOptions(style);
+
+    function setTypeOptions(style, type) {
+        console.log(`setTypeOptions: type = ${type}`);
+
+        setTypes(style);
+        $typeselect.html("");
+        types.forEach(function(item) {
+            if(type === item) {
+                $typeselect.append(`<option value=${item} selected>` + item + "</option>");
+            } else {
+                $typeselect.append(`<option value=${item}>` + item + "</option>");
+            }
+        });
+    }
+
+    setTypeOptions(style, type);
+
+    function setTypes(style) {
+        if(style === 'Ballet') {
+            types = ["Barre", "Centre"];
+        }
+        else if(style === 'Latin') {
+            types = ["Rumba", "Cha Cha Cha", "Samba", "Paso Doble", "Jive"];
+        }
+        else if(style === 'Ballroom') {
+            types = ["Waltz", "Foxtrot", "Viennese Waltz", "Quickstep", "Tango"];
+        }
+        else if(style === 'Hip Hop') {
+            types = ["Locking", "Hip-hop", "Popping", "House", "Breaking"];
+        }
+    }
+
+    function setLength(length) {
+        console.log(`setLength: length = ${length}`);
+        console.log(`$playlength.value = ${$playlength.value}`);
+        $playlength[0].value = length;
+    }
+
+    setLength(length);
 });

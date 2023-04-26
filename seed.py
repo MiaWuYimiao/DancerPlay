@@ -2,7 +2,7 @@ from models import User, FavPlaylist, Playlist, Music, PlaylistMusic, db
 from app import app
 
 app.app_context().push()
-# Create pets table
+# Create musics table
 db.drop_all()
 db.create_all()
 

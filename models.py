@@ -20,13 +20,17 @@ class User(db.Model):
     first_name = db.Column(db.String(30), nullable=False)
     last_name = db.Column(db.String(30), nullable=False)
     email = db.Column(db.String(50), nullable=False, unique=True)
-    head_img = db.Column(db.Text)
-    fav_type = db.Column(db.String(30))
+    head_img = db.Column(db.Text, default="/static/images/default-pic.png")
+    fav_type = db.Column(db.String(30), default="None")
 
     playlists = db.relationship(
         "Playlist", 
         secondary="favoriteplaylists")
 
+    def is_like(self, playlist):
+        """Is this user like 'playlist'? """
+        found_fav_list = [pl for pl in self.playlists if pl == playlist]
+        return len(found_fav_list) == 1
 
     @classmethod
     def register(cls, username, password, first_name, last_name, email, head_img, fav_type):

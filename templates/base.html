@@ -13,23 +13,59 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-light bg-primary justify-content-between ">
-        <div class="container">
-          <a href="/" class="navbar-brand text-light">DancePlay</a>
-          <ul class="nav navbar-nav flex-row float-right">
-            {% if session['username'] %}
-            <li class="nav-item">
-              <a class="nav-link pr-3 text-light" href="/logout">Logout</a>
-            </li>
-            {% else %}
-            <li class="nav-item">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-primary">
+      <!-- Container wrapper -->
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <a href="/" class="navbar-brand text-light">DancePlay</a>
+          </div>
+          {% if not g.user %}
+          <ul class="nav navbar-nav ml-auto flex-row float-right"></ul>
+            <li class="navbar-nav nav-item">
               <a class="nav-link pr-3 text-light" href="/login">Login</a>
             </li>
-            <li class="nav-item">
+            <li class="navbar-nav nav-item">
               <a class="nav-link text-light" href="/register">Sign up</a>
             </li>
-            {% endif %}
           </ul>
+          {% else %}
+          <!-- Avatar -->
+          <div class="dropdown ml-auto">
+            <a
+              class="dropdown-toggle d-flex align-items-center hidden-arrow"
+              href="#"
+              role="button"
+              data-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <img
+                src="{{g.user.head_img}}"
+                class="rounded-circle"
+                height="25"
+                alt="Black and White Portrait of a Man"
+                loading="lazy"
+              />
+            </a>
+            <ul
+              class="dropdown-menu dropdown-menu-right"
+              aria-labelledby="navbarDropdownMenuAvatar"
+            >
+              <li>
+                <a class="dropdown-item" href="/users/{{g.user.username}}">My profile</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="/users/{{g.user.username}}/mylist">My List</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="/logout">Logout</a>
+              </li>
+            </ul>
+          </div>
+          <!-- <li class="nav-item">
+            <a class="nav-link pr-3 text-light" href="/logout">Logout</a>
+          </li> -->
+          {% endif %}
         </div>
     </nav>
 
