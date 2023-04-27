@@ -1,12 +1,11 @@
 import re
 # API client library
 import googleapiclient.discovery
-from secret import API_SECRET_KEY
 
 # API information
 api_service_name = "youtube"
 api_version = "v3"
-DEVELOPER_KEY = API_SECRET_KEY
+DEVELOPER_KEY = 'AIzaSyAXlQataX1RHOLnxSk8U7eGZFbglWtFbbI'
 # API client
 youtube = googleapiclient.discovery.build(
         api_service_name, api_version, developerKey = DEVELOPER_KEY)

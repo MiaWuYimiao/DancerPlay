@@ -126,15 +126,15 @@ def delete_user(username):
 
 
 #################  Search and add music playlist #############
-@app.before_request
-def add_playlist_to_g():
-    """If we're logged in, add curr user to Flask global."""
+# @app.before_request
+# def add_playlist_to_g():
+#     """If we're logged in, add curr user to Flask global."""
 
-    if CURR_PLAYLIST_KEY in session:
-        g.playlist = Playlist.query.get(session[CURR_PLAYLIST_KEY])
+#     if CURR_PLAYLIST_KEY in session:
+#         g.playlist = Playlist.query.get(session[CURR_PLAYLIST_KEY])
 
-    else:
-        g.playlist = None
+#     else:
+#         g.playlist = None
 
 
 # Search routes
@@ -148,16 +148,16 @@ def search_music():
     playlist, durationTotal, img_url = search_videos(style, type, length)
 
     # Add searched list to DB
-    new_playlist = Playlist(name='new playlist',
-                            description=f"A list of {style} {type}",
-                            image_url=img_url,
-                            type=type,
-                            length=durationTotal)
-    db.session.add(new_playlist)
-    db.session.commit()
+    # new_playlist = Playlist(name='new playlist',
+    #                         description=f"A list of {style} {type}",
+    #                         image_url=img_url,
+    #                         type=type,
+    #                         length=durationTotal)
+    # db.session.add(new_playlist)
+    # db.session.commit()
 
     # add new playlist to session
-    session[CURR_PLAYLIST_KEY] = new_playlist.id
+    # session[CURR_PLAYLIST_KEY] = new_playlist.id
     # Add new playlist to Flask global
     # g.playlist = new_playlist
 
@@ -165,7 +165,7 @@ def search_music():
     sec = int(durationTotal%60)
     totalTime = ''.join(map(str,[min, ' min ', sec, ' sec']))
 
-    return render_template('index.html', playlist=playlist, totalTime=totalTime, style=style, type=type, length=length)
+    return render_template('index.html', playlist=playlist, totalTime=totalTime, style=style, type=type, length=length, durationTotal=durationTotal, img_url=img_url)
 
 
 @app.route('/users/like', methods=["GET","POST"])
@@ -176,14 +176,22 @@ def playlist_add():
         flash("Access unauthorized.", "danger")
         return redirect("/")
 
-    playlist = g.playlist
-    if playlist:
+    new_playlist = Playlist(name=request.form.get('name'),
+                            description=f'A list of {request.form.get("style")} {request.form.get("type")}',
+                            image_url=request.form.get("img_url"),
+                            type=request.form.get("type"),
+                            length=request.form.get("durationTotal"))
+    db.session.add(new_playlist)
+    db.session.commit()
 
-        playlist.name = f"playlist-{playlist.id}"
-        g.user.playlists.append(playlist)
+    # playlist = g.playlist
+    if new_playlist:
+
+        new_playlist.name = f"playlist-{new_playlist.id}"
+        g.user.playlists.append(new_playlist)
         db.session.commit()
 
-    return redirect('/')
+    return redirect('/search?style=Ballet&type=Barre&length=20')
 
 
 @app.route('/users/<username>/mylist', methods=["GET"])

@@ -65,20 +65,17 @@
             <!-- <a type="submit" id="next-group" class="btn btn-default btn-sm float-right" href="">
                 <span class="glyphicon glyphicon-refresh"></span>
             </a> -->
-            {% if g.user and g.playlist %}
-                {% if not g.user.is_like(g.playlist.id)%}
+            {% if g.user %}
                 <form id = "add" method="POST" action="/users/like">
+                    <input type="hidden" value="new playlist" name="name"></input>
+                    <input type="hidden" value="{{ durationTotal }}" name="durationTotal"></input>
+                    <input type="hidden" value="{{ type }}" name="type"></input>
+                    <input type="hidden" value="{{ style }}" name="style"></input>
+                    <input type="hidden" value="{{ img_url }}" name="img_url"></input>
                     <button id="like" class="btn btn-default btn-sm float-right">
-                        <span class="glyphicon glyphicon-plus font-weight-bold">Add {{g.playlist.id}}</span>
+                        <span class="glyphicon glyphicon-plus font-weight-bold">Add</span>
                     </button>
                 </form>
-                {% else %}
-                <form method="POST" action="/users/like">
-                    <button id="like" class="btn btn-default btn-sm float-right">
-                        <span class="glyphicon font-weight-bold">Added</span>
-                    </button>
-                </form>
-                {% endif %}
             {% endif %}
         </div>
         <span>{{ totalTime }}</span>
