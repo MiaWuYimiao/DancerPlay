@@ -29,8 +29,20 @@ class User(db.Model):
 
     def is_like(self, playlist):
         """Is this user like 'playlist'? """
-        found_fav_list = [pl for pl in self.playlists if pl == playlist]
-        return len(found_fav_list) == 1
+
+        print(f'is_like playlist length: {len(playlist)}')
+
+        found_list = False
+        for pl in self.playlists:
+            if len(pl.musics) == len(playlist):
+                found_list = True
+                for i in range(len(playlist)):
+                    if pl.musics[i].videoId != playlist[i]["videoId"]:
+                        found_list = False
+            if found_list == True:
+                break
+   
+        return found_list
 
     @classmethod
     def register(cls, username, password, first_name, last_name, email, head_img, fav_type):
@@ -86,11 +98,10 @@ class Music(db.Model):
 
     # ADD THE NECESSARY CODE HERE
     id = db.Column( db.Integer, primary_key=True, autoincrement=True,)
-    title = db.Column( db.String(50), nullable=False,)
-    genre = db.Column( db.String(30), nullable=False,)
+    title = db.Column( db.String(100), nullable=False,)
+    style = db.Column( db.String(30), nullable=False,)
     type = db.Column( db.String(30), nullable=False,)
-    length = db.Column( db.Integer, nullable=False,)
-    videoId = db.Column( db.Text, nullable=False,)
+    videoId = db.Column( db.Text, nullable=False, unique=True)
     image_url = db.Column( db.Text, nullable=False,)
 
 

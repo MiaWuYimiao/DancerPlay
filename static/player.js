@@ -15,7 +15,7 @@ $(document).ready(function(){
     function createHTMLVideoPlayers(){
         console.log(`playlist size: ${totalCount}`);
         $('.container-sm').empty();
-        playlist.forEach(function(id, index){
+        playlist.forEach(function(item, index){
             $('.container-sm').append(`
                 <body>
                     <div class="youTube" id="player${index}">
@@ -30,11 +30,11 @@ $(document).ready(function(){
 
     // This function creates an <iframe> (and YouTube player)
     function onYouTubeIframeAPIReady() {
-        playlist.forEach(function(id, index){
+        playlist.forEach(function(item, index){
             players[`player${index}`] = new YT.Player(`player${index}`, {
                 height: '300',
                 width: '500',
-                videoId: id,
+                videoId: item["videoId"],
                 playerVars: {
                     'autoplay': 0
                 },
@@ -49,8 +49,9 @@ $(document).ready(function(){
     // The API will call this function when the video player is ready.
     function onPlayerReady(event) {
         // Let the first player start to play the video when player is ready.
-        if(event.target.h.id == 'player0') {
-            console.log(event.target)
+        console.log("onPlayerReady")
+        console.log(event.target.g.id)
+        if(event.target.g.id == 'player0') {
             event.target.playVideo();
             currentPlayerId = 0;
             currentPlayerState = true;
@@ -71,17 +72,17 @@ $(document).ready(function(){
         }
 
         if(event.data == YT.PlayerState.PAUSED) {
-            if(event.target.h.id === `player${currentPlayerId}`) {
+            if(event.target.g.id === `player${currentPlayerId}`) {
                 currentPlayerState = false;
                 updatePlayBtn(false);
             }
         }
 
         if(event.data == YT.PlayerState.PLAYING) {
-            if(event.target.h.id != `player${currentPlayerId}`) {
+            if(event.target.g.id != `player${currentPlayerId}`) {
                 players[`player${currentPlayerId}`].pauseVideo();
             }
-            currentPlayerId = event.target.h.id.replace(/^\D+/g, '');
+            currentPlayerId = event.target.g.id.replace(/^\D+/g, '');
             currentPlayerState = true;
             updatePlayBtn(true);
         }
@@ -226,7 +227,7 @@ $(document).ready(function(){
         else if(style === 'Ballroom') {
             types = ["Waltz", "Foxtrot", "Viennese Waltz", "Quickstep", "Tango"];
         }
-        else if(style === 'Hip Hop') {
+        else if(style === 'Hip') {
             types = ["Locking", "Hip-hop", "Popping", "House", "Breaking"];
         }
     }

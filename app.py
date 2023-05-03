@@ -4,6 +4,7 @@ from models import User, connect_db, db, FavPlaylist, Playlist, Music, PlaylistM
 from forms import UserForm, LoginForm
 from search import search_videos
 from sqlalchemy.exc import IntegrityError
+import ast
 
 CURR_USER_KEY = "curr_user"
 CURR_PLAYLIST_KEY = "curr_playlist"
@@ -145,53 +146,62 @@ def search_music():
     type = request.args.get("type")
     length = request.args.get("length")
 
-    playlist, durationTotal, img_url = search_videos(style, type, length)
-
-    # Add searched list to DB
-    # new_playlist = Playlist(name='new playlist',
-    #                         description=f"A list of {style} {type}",
-    #                         image_url=img_url,
-    #                         type=type,
-    #                         length=durationTotal)
-    # db.session.add(new_playlist)
-    # db.session.commit()
-
-    # add new playlist to session
-    # session[CURR_PLAYLIST_KEY] = new_playlist.id
-    # Add new playlist to Flask global
-    # g.playlist = new_playlist
+    playlist, durationTotal = search_videos(style, type, length)
 
     min = int(durationTotal/60)
     sec = int(durationTotal%60)
     totalTime = ''.join(map(str,[min, ' min ', sec, ' sec']))
 
-    return render_template('index.html', playlist=playlist, totalTime=totalTime, style=style, type=type, length=length, durationTotal=durationTotal, img_url=img_url)
+    return render_template('index.html', playlist=playlist, totalTime=totalTime, style=style, type=type, length=length, durationTotal=durationTotal)
 
 
 @app.route('/users/like', methods=["GET","POST"])
 def playlist_add():
     """Add a playlist"""
 
+    style = request.form.get("style")
+    type = request.form.get("type")
+    length = request.form.get("length")
+    playlist = request.form.get("playlist")
+    playlistarray = list(eval(playlist))
+
     if not g.user:
         flash("Access unauthorized.", "danger")
-        return redirect("/")
+        return redirect(f'/search?style={style}&type={type}&length={length}')
 
-    new_playlist = Playlist(name=request.form.get('name'),
-                            description=f'A list of {request.form.get("style")} {request.form.get("type")}',
-                            image_url=request.form.get("img_url"),
-                            type=request.form.get("type"),
+
+    # Add a new playlist
+    new_playlist_model = Playlist(name=request.form.get('name'),
+                            description=f'A list of {style} {type}',
+                            image_url=playlistarray[0]["image_url"],
+                            type=type,
                             length=request.form.get("durationTotal"))
-    db.session.add(new_playlist)
+    db.session.add(new_playlist_model)
     db.session.commit()
 
-    # playlist = g.playlist
-    if new_playlist:
-
-        new_playlist.name = f"playlist-{new_playlist.id}"
-        g.user.playlists.append(new_playlist)
+    if new_playlist_model:
+        new_playlist_model.name = f"playlist-{new_playlist_model.id}"
+        g.user.playlists.append(new_playlist_model)
         db.session.commit()
 
-    return redirect('/search?style=Ballet&type=Barre&length=20')
+    # add musics to the new_playlist
+    for music in playlistarray:
+
+        musicExist = Music.query.filter(Music.videoId == music["videoId"]).first()
+        if not musicExist:
+            music_model = Music(title=music["title"],
+                                style=music["style"],
+                                type=music["type"],
+                                videoId=music["videoId"],
+                                image_url=music["image_url"])
+            db.session.add(music_model)
+            new_playlist_model.musics.append(music_model)
+        else:
+            new_playlist_model.musics.append(musicExist)
+    
+    db.session.commit()
+
+    return redirect(f'/search?style={style}&type={type}&length={length}')
 
 
 @app.route('/users/<username>/mylist', methods=["GET"])
@@ -205,6 +215,48 @@ def show_user_playlist(username):
     user = User.query.get_or_404(username)
 
     return render_template('user_playlist.html', user=user)
+
+
+@app.route('/playlist/<int:playlist_id>', methods=["GET"])
+def show_playlist_videos(playlist_id):
+    """show music videos of the playlist in home page"""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    playlist = Playlist.query.get_or_404(playlist_id)
+    playlistarray = []
+    style = " "
+    for music in playlist.musics:
+        playlistarray.append({
+            "title" : music.title,
+            "style" : music.style,
+            "type" : music.type,
+            "videoId" : music.videoId,
+            "image_url" : music.image_url
+        })
+        style = music.style
+
+    min = int(playlist.length/60)
+    sec = int(playlist.length%60)
+    totalTime = ''.join(map(str,[min, ' min ', sec, ' sec']))
+    
+    return render_template('index.html', playlist=playlistarray, totalTime=totalTime, style=style, type=playlist.type, length=20, durationTotal=playlist.length)
+   
+@app.route('/playlist/<int:playlist_id>/delete', methods=["POST"])
+def delete_playlist(playlist_id):
+    """Delete playlist """
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    pl = Playlist.query.get_or_404(playlist_id)
+    g.user.playlists.remove(pl)
+    db.session.commit()
+
+    return redirect(f"/users/{g.user.username}/mylist")
 
 ################ Homepage and error pages ################
 

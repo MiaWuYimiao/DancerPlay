@@ -11,14 +11,14 @@ youtube = googleapiclient.discovery.build(
         api_service_name, api_version, developerKey = DEVELOPER_KEY)
 # Request body
 
-def search_videos(type, subtype, length):
+def search_videos(style, type, length):
         count = int(length)/2;
         # Send request to youtube data api to get a list of video information.
         # The return information will contains videoId which used for embed youtube iframe
         idRequest = youtube.search().list(
                 part="id,snippet",
                 type='video',
-                q=subtype+'music',
+                q=type+'music',
                 videoDuration='short',
                 videoDefinition='high',
                 maxResults=count,
@@ -31,15 +31,20 @@ def search_videos(type, subtype, length):
         # Build initial list of videoId.
         playlist = []
         for item in response['items']:
-                playlist.append(item['id']['videoId'])
-
-        # Get the image_url of first video
-        image_url = response['items'][0]['snippet']['thumbnails']['high']['url']
+                musicItem = {
+                        "title" : item['snippet']['title'],
+                        "style" : style,
+                        "type" : type,
+                        "videoId" : item['id']['videoId'],
+                        "image_url" : item['snippet']['thumbnails']['high']['url']
+                }
+                print(musicItem)
+                playlist.append(musicItem)
 
 
         # Refine the list based on length
         # This request fetch the duration info of videos
-        ids = ",".join(id for id in playlist)
+        ids = ",".join(item["videoId"] for item in playlist)
         durationRequest = youtube.videos().list(
                 part="contentDetails",
                 id=ids
@@ -71,4 +76,4 @@ def search_videos(type, subtype, length):
                         durationTotal += min*60+sec
 
         print(f"durationTotal {durationTotal}")
-        return playlist[:noVideos], durationTotal, image_url
+        return playlist[:noVideos], durationTotal
