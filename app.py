@@ -10,7 +10,12 @@ CURR_USER_KEY = "curr_user"
 CURR_PLAYLIST_KEY = "curr_playlist"
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL', 'postgresql:///dancerplay_db')
+
+if os.getenv('DATABASE_URL'):
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv('DATABASE_URL').replace("postgres://", "postgresql://", 1)
+else:
+    app.config["SQLALCHEMY_DATABASE_URI"] = 'postgresql:///dancerplay_db'
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ECHO"] = True
 app.config["SECRET_KEY"] = os.environ.get('SECRET_KEY', '12345')
