@@ -4,16 +4,16 @@ from models import User, connect_db, db, FavPlaylist, Playlist, Music, PlaylistM
 from forms import UserForm, LoginForm
 from search import search_videos
 from sqlalchemy.exc import IntegrityError
-import ast
+import os
 
 CURR_USER_KEY = "curr_user"
 CURR_PLAYLIST_KEY = "curr_playlist"
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///dancerplay_db"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL', 'postgresql:///dancerplay_db')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ECHO"] = True
-app.config["SECRET_KEY"] = "12345"
+app.config["SECRET_KEY"] = os.environ.get('SECRET_KEY', '12345')
 app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
 
 connect_db(app)

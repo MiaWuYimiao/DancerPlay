@@ -49,8 +49,6 @@ $(document).ready(function(){
     // The API will call this function when the video player is ready.
     function onPlayerReady(event) {
         // Let the first player start to play the video when player is ready.
-        console.log("onPlayerReady")
-        console.log(event.target.g.id)
         if(event.target.g.id == 'player0') {
             event.target.playVideo();
             currentPlayerId = 0;
