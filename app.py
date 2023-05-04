@@ -121,7 +121,7 @@ def logout_user():
 
 @app.route('/users/<username>')
 def user_detail_page(username):
-    if "username" not in session:
+    if CURR_USER_KEY not in session or session[CURR_USER_KEY] != username:
         flash("Please login first", "danger")
         return redirect(url_for('login_page'))
 
@@ -130,7 +130,7 @@ def user_detail_page(username):
 
 @app.route('/users/<username>/delete')
 def delete_user(username):
-    if "username" not in session:
+    if CURR_USER_KEY not in session or session[CURR_USER_KEY] != username:
         flash("Please login first", "danger")
         return redirect(url_for('login_page'))
 
