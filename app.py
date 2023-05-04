@@ -4,6 +4,7 @@ from models import User, connect_db, db, FavPlaylist, Playlist, Music, PlaylistM
 from forms import UserForm, LoginForm
 from search import search_videos
 from sqlalchemy.exc import IntegrityError
+import sqlalchemy as sa
 import os
 
 CURR_USER_KEY = "curr_user"
@@ -24,6 +25,16 @@ app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
 connect_db(app)
 
 toolbar = DebugToolbarExtension(app)
+
+engine = sa.create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+inspector = sa.inspect(engine)
+if not inspector.has_table("users"):
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
+        app.logger.info('Initialized the database!')
+else:
+    app.logger.info('Database already contains the users table.')
 
 ########### User Register, Login, Logout ##############
 
